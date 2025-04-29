@@ -78,3 +78,25 @@ exports.validateWordService = asyncHandler( async (req, res, next) => {
     next(err);
     }
 });
+
+
+exports.addWordService = asyncHandler (async (req, res, next) => {
+    try {
+        const { word } = req.body;
+        if (!word) {
+            return res.status(400).json({ message: 'Word is required' });
+        }
+    
+        const normalized = normalizeArabic(word);
+    
+        const existing = await Word.findOne({ word: normalized });
+        if (existing) {
+            return res.status(409).json({ message: 'Word already exists' });
+        }
+    
+        await Word.create({ word: normalized });
+        res.status(201).json({ message: 'Word added successfully', word: normalized });
+    } catch (err) {
+        next(err);
+    }
+});

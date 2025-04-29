@@ -73,6 +73,26 @@ This project is an Arabic spellchecker designed to identify and correct spelling
   ```
 
 -------
+
+- #### Validate the word
+    POST https://arabic-spellchecker.vercel.app/spellcheck/add
+  ###### Request Body (JSON):
+  ```json
+  {
+  "word": "مستشفى"
+  }
+  ```
+
+  ###### Response:
+  ```json
+      {
+        "message": "Word added successfully",
+        "word": "مستشفى"
+      }
+  ```
+
+  
+-------
 ## Usage
 
 Import the spellchecker module and use it in your Python project:
