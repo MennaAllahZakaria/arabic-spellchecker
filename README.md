@@ -26,31 +26,53 @@ This project is an Arabic spellchecker designed to identify and correct spelling
 
 
 ## 📡 API Endpoint
-POST https://arabic-spellchecker.vercel.app/spellcheck/correct
-###### Request Body (JSON):
-```json
-{
-  "text": "ادخا الكلمه هنا"
-}
 
-```
+- #### Correct the text
+  POST https://arabic-spellchecker.vercel.app/spellcheck/correct
+  ###### Request Body (JSON):
+  ```json
+  {
+    "text": "ادخا الكلمه هنا"
+  }
 
-###### Response:
-```json
-{
-  "correctedText": "ادخل الكلمه هنا",
-  "details": [
-    {
-      "original": "ادخا",
-      "correct": "ادخل",
-      "suggestions": ["ادخل", "ادها", "ادعا"]
-    },
-    ...
-  ]
-}
+  ```
 
-```
+  ###### Response:
+  ```json
+  {
+    "correctedText": "ادخل الكلمه هنا",
+    "details": [
+      {
+        "original": "ادخا",
+        "correct": "ادخل",
+        "suggestions": ["ادخل", "ادها", "ادعا"]
+      },
+      ...
+    ]
+  }
 
+  ```
+
+- #### Validate the word
+    POST https://arabic-spellchecker.vercel.app/spellcheck/validate
+  ###### Request Body (JSON):
+  ```json
+  {
+    "word": "كلمت"
+  }
+  ```
+
+  ###### Response:
+  ```json
+      {
+      "word": "كلمت",
+      "isCorrect": false,
+      "suggestions": ["كلمة", "كلمات", "كلم"]
+    }
+
+  ```
+
+-------
 ## Usage
 
 Import the spellchecker module and use it in your Python project:

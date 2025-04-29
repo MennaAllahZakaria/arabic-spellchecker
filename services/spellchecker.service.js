@@ -40,4 +40,41 @@ exports.correctTextService=asyncHandler(async (req, res) => {
         console.error(err);
         res.status(500).json({ error: 'Server error' });
     }
-})
+});
+
+
+exports.validateWordService = asyncHandler( async (req, res, next) => {
+    try {
+        const { word } = req.body;
+        if (!word) return res.status(400).json({ message: 'Word is required' });
+
+        const normalized = normalizeArabic(word);
+        const isCorrect = await Word.exists({ word: normalized });
+
+        if (isCorrect) {
+            return res.status(200).json({
+                word,
+                isCorrect: true,
+                suggestions: [],
+            });
+        }
+
+        const allWords = await Word.find({}, { word: 1 });
+        const suggestions = allWords
+            .map(({ word: w }) => ({
+            word: w,
+            distance: getLevenshteinDistance(normalized, w),
+            }))
+            .sort((a, b) => a.distance - b.distance)
+            .slice(0, 3)
+            .map(s => s.word);
+
+        res.status(200).json({
+            word,
+            isCorrect: false,
+            suggestions,
+    });
+    } catch (err) {
+    next(err);
+    }
+});
