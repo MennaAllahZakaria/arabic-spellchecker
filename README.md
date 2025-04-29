@@ -21,7 +21,7 @@ This project is an Arabic spellchecker designed to identify and correct spelling
     ```
 3. Install dependencies:
     ```bash
-    pip install -r requirements.txt
+    npm install 
     ```
 
 
