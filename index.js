@@ -1,33 +1,17 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const ApiError = require("./utils/apiError");
-dotenv.config({ path: "config.env" });
-const morgan = require("morgan");
-const cors = require("cors");
-const compression = require("compression");
-const mountRoutes = require("./routes/index");
-const globalError = require("./middleware/errorMiddleware");
+const express = require('express');
 const dbConnection = require("./config/database");
-//Routes
-// const mountRoutes = require("./routes");
-const path = require("path");
-//connect with db
-dbConnection();
+const dotenv = require('dotenv');
+const morgan = require('morgan');
+const cors = require('cors');
+const compression = require('compression');
+const globalError = require("./middlewares/errorMiddleware");
+const mountRoutes = require("./routes/index.routes");
 
-//express app
+const ApiError = require("./utils/apiError");
+const path = require('path');
+dotenv.config({ path: "config.env" });
+
 const app = express();
-
-// // forgetpassword
-// const session = require("express-session");
-
-// app.use(
-//   session({
-//     secret: process.env.SESSION_SECRET, // Replace with your own secret
-//     resave: false,
-//     saveUninitialized: true,
-//     cookie: { secure: false, maxAge: 30 * 60 * 1000 }, // Set secure to true if using HTTPS 30 دقيقة
-//   })
-// );
 
 // Enable other domains to access your application
 app.use(cors());
@@ -36,54 +20,19 @@ app.options("*", cors());
 // compress all responses
 app.use(compression());
 
-//Middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));// form-data 
-app.use(express.static(path.join(__dirname, "uploads"))); // /name photo => in localhost
+app.use(express.urlencoded({ extended: true })); // form-data
+// Connect to MongoDB
+dbConnection();
+
+//Mount Routes
+mountRoutes(app);
 
 if (process.env.NODE_ENV == "development") {
   app.use(morgan("dev"));
   console.log(process.env.NODE_ENV);
 }
 
-// app.get("/", (req, res) => {
-//   res.send("Hello World!");
-// });
-
-// app.use((req, res, next) => {
-//   res.status(404).send("Can't find this route: " + req.originalUrl);
-// });
-
-//
-const Verification = require("./models/codeModel");
-
-const deleteExpiredVerifications = async () => {
-  const now = new Date();
-
-  try {
-    // Find all expired records
-    const expiredVerifications = await Verification.find({
-      expiresAt: { $lt: now },
-    });
-
-    // Delete all expired records
-    await Verification.deleteMany({
-      _id: { $in: expiredVerifications.map((v) => v._id) },
-    });
-
-    console.log(
-      `${expiredVerifications.length} expired verifications deleted.`
-    );
-  } catch (err) {
-    console.error("Error deleting expired verifications:", err);
-  }
-};
-
-// Call the function
-deleteExpiredVerifications();
-
-//Mount Routes
-mountRoutes(app);
 
 app.all("*", (req, res, next) => {
   //Create error and send it to error handling middleware
