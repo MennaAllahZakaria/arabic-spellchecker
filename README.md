@@ -34,6 +34,7 @@ POST https://arabic-spellchecker.vercel.app/spellcheck/correct
 }
 
 ```
+
 ###### Response:
 ```json
 {
