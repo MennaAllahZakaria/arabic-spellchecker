@@ -1,0 +1,7 @@
+# استبعاد مجلد node_modules
+node_modules/
+
+# استبعاد ملف config.env
+config.env
+
+.vscode
