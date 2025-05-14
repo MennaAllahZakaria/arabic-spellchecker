@@ -3,5 +3,5 @@ node_modules/
 
 # استبعاد ملف config.env
 config.env
-
+scripts/te.txt
 .vscode

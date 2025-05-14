@@ -100,3 +100,74 @@ exports.addWordService = asyncHandler (async (req, res, next) => {
         next(err);
     }
 });
+
+
+exports.getAllWords = async (req, res, next) => {
+    try {
+        // Pagination and Search Query
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const search = req.query.search || '';
+
+        const query = search ? { word: { $regex: search, $options: 'i' } } : {};
+
+        // Count total documents
+        const totalWords = await Word.countDocuments(query);
+
+        // Fetch words with pagination and search
+        const words = await Word.find(query)
+        .skip((page - 1) * limit)
+        .limit(limit);
+
+        res.status(200).json({
+        totalWords,
+        currentPage: page,
+        totalPages: Math.ceil(totalWords / limit),
+        words,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.getSpellcheckerStats = async () => {
+  // Get total number of words
+    const totalWords = await Word.countDocuments();
+
+    // Get the last added word
+    const lastAddedWordDoc = await Word.findOne().sort({ _id: -1 }).limit(1);
+    const lastAddedWord = lastAddedWordDoc ? lastAddedWordDoc.word : null;
+
+    // Get the most suggested word (Optional: If you want to track suggestions in DB)
+    // For now, let's assume we have a `suggestionCount` in the Word model:
+    const mostSuggestedDoc = await Word.findOne()
+        .sort({ suggestionCount: -1 })
+        .limit(1);
+
+    const mostSuggestedWord = mostSuggestedDoc ? mostSuggestedDoc.word : null;
+    const suggestionCount = mostSuggestedDoc ? mostSuggestedDoc.suggestionCount : 0;
+
+    return {
+        totalWords,
+        lastAddedWord,
+        mostSuggestedWord,
+        suggestionCount,
+    };
+};
+exports.deleteWordService = asyncHandler(async (req, res) => {
+    const { word } = req.params;
+
+    if (!word) {
+        return res.status(400).json({ error: 'Word is required' });
+    }
+
+    const normalized = normalizeArabic(word);
+
+    const result = await Word.deleteOne({ word: normalized });
+
+    if (result.deletedCount === 0) {
+        return res.status(404).json({ error: `Word "${word}" not found` });
+    }
+
+    res.status(200).json({ message: `Word "${word}" deleted successfully` });
+});
