@@ -131,26 +131,6 @@ exports.getAllWords = asyncHandler(async(req,res ,next) => {
 });
 
 
-exports.getSpellcheckerStats = asyncHandler(async(req,res ,next) => {
-    // Execute all queries in parallel
-    const [totalWords, lastAddedWordDoc, mostSuggestedDoc] = await Promise.all([
-        Word.countDocuments(),
-        Word.findOne().sort({ _id: -1 }).limit(1),
-        Word.findOne().sort({ suggestionCount: -1 }).limit(1),
-    ]);
-
-    // Extract data
-    const lastAddedWord = lastAddedWordDoc ? lastAddedWordDoc.word : null;
-    const mostSuggestedWord = mostSuggestedDoc ? mostSuggestedDoc.word : null;
-    const suggestionCount = mostSuggestedDoc ? mostSuggestedDoc.suggestionCount : 0;
-
-    return {
-        totalWords,
-        lastAddedWord,
-        mostSuggestedWord,
-        suggestionCount,
-    };
-})
 exports.deleteWordService = asyncHandler(async (req, res) => {
     const { word } = req.params;
 

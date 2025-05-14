@@ -149,21 +149,6 @@ This project is an Arabic spellchecker designed to identify and correct spelling
       }
   ```
 
-- ### Get Spellchecker Statistics
-  GET https://arabic-spellchecker.vercel.app/spellchecker/stats
-
-  Description: Retrieves basic statistics about the spellchecker database, such as the total number of words, the most recently added word, and the most frequently suggested word (if usage data is stored).
-
-  Response:
-  ```json
-      {
-      "totalWords": 150,
-      "lastAddedWord": "جامعة",
-      "mostSuggestedWord": "مستشفى",
-      "suggestionCount": 20
-    }
-
-  ```
 
 - ### Delete Word 
   - DELETE https://arabic-spellchecker.vercel.app/spellchecker/:word
