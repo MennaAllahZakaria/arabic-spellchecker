@@ -102,7 +102,7 @@ exports.addWordService = asyncHandler (async (req, res, next) => {
 });
 
 
-exports.getAllWords = async (req, res, next) => {
+exports.getAllWords = asyncHandler(async(req,res ,next) => {
     try {
         // Pagination and Search Query
         const page = parseInt(req.query.page) || 1;
@@ -128,22 +128,19 @@ exports.getAllWords = async (req, res, next) => {
     } catch (err) {
         next(err);
     }
-};
+});
 
-exports.getSpellcheckerStats = async () => {
-  // Get total number of words
-    const totalWords = await Word.countDocuments();
 
-    // Get the last added word
-    const lastAddedWordDoc = await Word.findOne().sort({ _id: -1 }).limit(1);
+exports.getSpellcheckerStats = asyncHandler(async(req,res ,next) => {
+    // Execute all queries in parallel
+    const [totalWords, lastAddedWordDoc, mostSuggestedDoc] = await Promise.all([
+        Word.countDocuments(),
+        Word.findOne().sort({ _id: -1 }).limit(1),
+        Word.findOne().sort({ suggestionCount: -1 }).limit(1),
+    ]);
+
+    // Extract data
     const lastAddedWord = lastAddedWordDoc ? lastAddedWordDoc.word : null;
-
-    // Get the most suggested word (Optional: If you want to track suggestions in DB)
-    // For now, let's assume we have a `suggestionCount` in the Word model:
-    const mostSuggestedDoc = await Word.findOne()
-        .sort({ suggestionCount: -1 })
-        .limit(1);
-
     const mostSuggestedWord = mostSuggestedDoc ? mostSuggestedDoc.word : null;
     const suggestionCount = mostSuggestedDoc ? mostSuggestedDoc.suggestionCount : 0;
 
@@ -153,7 +150,7 @@ exports.getSpellcheckerStats = async () => {
         mostSuggestedWord,
         suggestionCount,
     };
-};
+})
 exports.deleteWordService = asyncHandler(async (req, res) => {
     const { word } = req.params;
 
